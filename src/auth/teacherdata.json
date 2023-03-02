@@ -1,0 +1,22 @@
+[
+  {
+    "username": "teacher1",
+    "password": "passteacher1"
+  },
+  {
+    "username": "teacher2",
+    "password": "passteacher2"
+  },
+  {
+    "username": "teacher3",
+    "password": "passteacher3"
+  },
+  {
+    "username": "teacher4",
+    "password": "passteacher4"
+  },
+  {
+    "username": "teacher5",
+    "password": "passteacher5"
+  }
+]

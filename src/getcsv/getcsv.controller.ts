@@ -31,7 +31,7 @@ import { importcsv } from './dto/importcsv.dto';
 
 //==================================================================//
 @Controller('teacher')
-@ApiBearerAuth('jwt')
+@ApiBearerAuth('jwt-auth')
 @ApiTags('Getting and update result')
 export class GetcsvController {
   constructor(private readonly getcsvService: GetcsvService) {}

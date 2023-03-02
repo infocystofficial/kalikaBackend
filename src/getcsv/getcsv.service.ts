@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { CreateGetcsvDto } from './dto/create-getcsv.dto';
 import { Query } from 'express-serve-static-core';
 //===================================================================//
+import csvToJson from 'csvtojson';
 
 @Injectable()
 export class GetcsvService {
@@ -17,6 +18,7 @@ export class GetcsvService {
     @InjectModel(getcsv.name)
     private readonly getcsvModel: Model<getcsvdocument>,
   ) {}
+  private result: object;
   //===========================================================================================//
   ///upload csv file and store the file in mongodb database converting to json
   async upload(file: Express.Multer.File): Promise<string> {
@@ -28,14 +30,15 @@ export class GetcsvService {
         'csvFile',
         file.originalname,
       );
-      fs.createReadStream(filepath, 'utf-8')
-        .pipe(csvParser())
+
+      fs.createReadStream(filepath)
+        .pipe(csvParser({}))
         .on('data', (data) => {
           data = JSON.stringify(data);
-          data = data.replaceAll(`'`, '');
           data = data.trim();
+          data = data.replaceAll(`  `, '_');
           data = data.toLowerCase();
-          data = data.replace('_', '');
+          data = data.replaceAll('_', '');
           data = JSON.parse(data);
           const model = new this.getcsvModel();
           model.Name = data.names || data.name || data.Name;
@@ -64,7 +67,7 @@ export class GetcsvService {
         .on('end', () => {
           return 'file stored successfully';
         })
-        .on('error', () => console.log('Error in saving file'));
+        .on('error', () => 'Error in saving file');
       setTimeout(() => {
         unlink(filepath);
       }, 5000);

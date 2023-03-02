@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { unlink } from 'fs/promises';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -11,6 +11,7 @@ import { CreateGetcsvDto } from './dto/create-getcsv.dto';
 import { Query } from 'express-serve-static-core';
 //===================================================================//
 import csvToJson from 'csvtojson';
+import { studentdatadto } from './dto/studentinput.dto';
 
 @Injectable()
 export class GetcsvService {
@@ -172,6 +173,24 @@ export class GetcsvService {
   async deleteall(): Promise<any> {
     try {
       return this.getcsvModel.deleteMany();
+    } catch (error) {
+      return error;
+    }
+  }
+  //=========================================================================================//
+  async searchStudent(body: studentdatadto): Promise<any> {
+    try {
+      const dbdata = await this.getcsvModel.find({
+        $and: [
+          { Class: Number(body.Class) },
+          { Year: body.Year },
+          { RollNo: Number(body.RollNo) },
+        ],
+      });
+      if (!dbdata) {
+        throw new BadRequestException('Invalid input Cannot resolve the data');
+      }
+      return dbdata;
     } catch (error) {
       return error;
     }

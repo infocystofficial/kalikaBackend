@@ -28,10 +28,10 @@ import { Query as ExpressQuery } from 'express-serve-static-core';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { importcsv } from './dto/importcsv.dto';
+import { studentdatadto } from './dto/studentinput.dto';
 
 //==================================================================//
-@Controller('teacher')
-@ApiBearerAuth('jwt-auth')
+@Controller('')
 @ApiTags('Getting and update result')
 export class GetcsvController {
   constructor(private readonly getcsvService: GetcsvService) {}
@@ -52,7 +52,8 @@ export class GetcsvController {
       },
     },
   })
-  @Post('/upload')
+  @Post('/teacher/upload')
+  @ApiBearerAuth('jwt-auth')
   @ApiCreatedResponse({ description: 'To upload the csv file ' })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -69,7 +70,8 @@ export class GetcsvController {
   }
   //============================================================//
   @UseGuards(AuthGuard('jwt'))
-  @Post()
+  @ApiBearerAuth('jwt-auth')
+  @Post('/teacher')
   @ApiBody({
     description: 'Required body for this endpoint',
     type: CreateGetcsvDto,
@@ -84,14 +86,16 @@ export class GetcsvController {
 
   //============================================================//
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @ApiBearerAuth('jwt-auth')
+  @Get('/teacher')
   @ApiOkResponse({ description: 'find all the student data ' })
   async findAll(@Query() query: ExpressQuery) {
     return this.getcsvService.findAll(query);
   }
   //===========================================================//
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
+  @ApiBearerAuth('jwt-auth')
+  @Get('/teacher/:id')
   @ApiOkResponse({
     description: 'Find the student of id ',
     type: CreateGetcsvDto,
@@ -101,7 +105,8 @@ export class GetcsvController {
   }
   //============================================================//
   @UseGuards(AuthGuard('jwt'))
-  @Put(':id')
+  @ApiBearerAuth('jwt-auth')
+  @Put('/teacher/:id')
   @ApiBody({
     description: 'required field to update student data',
     type: UpdateGetcsvDto,
@@ -117,15 +122,28 @@ export class GetcsvController {
   }
   //=============================================================//
   @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
+  @ApiBearerAuth('jwt-auth')
+  @Delete('/teacher/:id')
   @ApiOkResponse({ description: 'required token to delete individual data' })
   remove(@Param('id') id: string) {
     return this.getcsvService.remove(id);
   }
+  //====================================================================//
   @UseGuards(AuthGuard('jwt'))
-  @Delete()
+  @ApiBearerAuth('jwt-auth')
+  @Delete('/teacher/all')
   @ApiOkResponse({ description: 'required token to delete all data at once' })
   async deleteall(): Promise<any> {
     return this.getcsvService.deleteall();
+  }
+  //=================================================================================//
+  @Post('/student/input')
+  @ApiBody({
+    description: 'Required student form to get resutlt',
+    type: studentdatadto,
+  })
+  @ApiOkResponse({ description: 'Display student result' })
+  async searchStudent(@Body() body: studentdatadto): Promise<any> {
+    return this.getcsvService.searchStudent(body);
   }
 }
